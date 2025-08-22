@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>LocalMind (LAN AI Assistant)</title>
+		<style>
+			body {
+				font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial;
+				max-width: 900px;
+				margin: 24px auto;
+				padding: 0 12px;
+			}
+			textarea {
+				width: 100%;
+				height: 120px;
+			}
+			pre {
+				background: #f6f8fa;
+				padding: 12px;
+				border-radius: 6px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>LocalMind — LAN AI Assistant</h1>
+		<p>Simple web UI that proxies prompts to the local Ollama model <code>phi3:mini</code> via the backend.</p>
+
+		<label for="prompt">Prompt</label>
+		<textarea id="prompt" placeholder="Ask something...">Hello, who won the 2024 UEFA Champions League?</textarea>
+		<div style="margin-top: 8px"><button id="send">Send</button></div>
+
+		<h3>Response</h3>
+		<pre id="response">(no response yet)</pre>
+
+		<script>
+			document.getElementById("send").addEventListener("click", async () => {
+				const prompt = document.getElementById("prompt").value;
+				const respEl = document.getElementById("response");
+				respEl.textContent = "Thinking...";
+				try {
+					const r = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
+					if (!r.ok) {
+						const err = await r.json().catch(() => ({ detail: r.statusText }));
+						respEl.textContent = "Error: " + (err.detail || JSON.stringify(err));
+						return;
+					}
+					const j = await r.json();
+					respEl.textContent = j.response || "(empty response)";
+				} catch (e) {
+					respEl.textContent = "Fetch error: " + e.toString();
+				}
+			});
+		</script>
+	</body>
+</html>

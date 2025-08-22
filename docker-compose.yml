@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+    localmind:
+        build: .
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./:/app:cached
+        environment:
+            - PYTHONUNBUFFERED=1
+        restart: unless-stopped
+# Note: Ollama is typically installed on the host. If you want Ollama inside a container,
+# you'd need to install it in this image or run another container with Ollama's services
+# and ensure the `ollama` CLI/daemon is reachable from the app container.
